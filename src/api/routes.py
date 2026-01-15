@@ -10,7 +10,8 @@ from typing import Dict, List, Optional, AsyncGenerator
 
 import fastapi
 from fastapi import Request, HTTPException
-from fastapi.responses import JSONResponse, StreamingResponse
+import os
+from fastapi.responses import JSONResponse, StreamingResponse, FileResponse
 
 from agent.stihl_agent import STIHLAnalyticsAgent
 
@@ -32,11 +33,11 @@ def serialize_sse_event(data: Dict) -> str:
     """Serialize data as SSE event."""
     return f"data: {json.dumps(data)}\n\n"
 
-
 @router.get("/")
 async def index():
-    """Health check endpoint."""
-    return {"status": "ok", "agent": "STIHL Analytics Agent"}
+    """Serve the React frontend."""
+    html_path = os.path.join(os.path.dirname(__file__), "templates", "index.html")
+    return FileResponse(html_path, media_type="text/html")
 
 
 @router.get("/health")
