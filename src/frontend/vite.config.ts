@@ -9,6 +9,15 @@ export default defineConfig({
       "~": resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      "/agent": "http://localhost:8000",
+      "/chat": "http://localhost:8000",
+      "/health": "http://localhost:8000",
+      "/skills": "http://localhost:8000",
+      "/route": "http://localhost:8000",
+    },
+  },
   build: {
     outDir: "../api/static/react",
     emptyOutDir: true,

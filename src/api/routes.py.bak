@@ -69,7 +69,7 @@ async def get_agent_info(request: Request):
         return JSONResponse(content={
             "name": "STIHL Analytics Agent",
             "metadata": {
-                "logo": "stihl-logo.png",  # Icon name for frontend
+                "logo": "chart",  # Icon name for frontend
                 "description": "AI-powered analytics for STIHL equipment data",
                 "skills": [s["name"] for s in skills]
             },
