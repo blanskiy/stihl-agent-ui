@@ -7,7 +7,7 @@ An AI-powered analytics platform for STIHL power equipment data, featuring natur
 [![OpenAI](https://img.shields.io/badge/Azure%20OpenAI-GPT--4o--mini-412991?logo=openai)](https://azure.microsoft.com/en-us/products/ai-services/openai-service)
 [![React](https://img.shields.io/badge/React-Fluent%20UI-61DAFB?logo=react)](https://react.dev)
 
-**🔗 Live Demo:** [ca-stihl-rnofgqn7g5tzm.happyrock-6ed25c83.westus2.azurecontainerapps.io](https://ca-stihl-rnofgqn7g5tzm.happyrock-6ed25c83.westus2.azurecontainerapps.io)
+**🔗 Live Demo:** [ca-stihl-rnofgqn7g5tzm.happyrock-6ed25c83.westus2.azurecontainerapps.io](Available upon request)
 
 ---
 
@@ -499,3 +499,4 @@ This project is for portfolio demonstration purposes.
 ---
 
 *Last Updated: January 15, 2026*
+
