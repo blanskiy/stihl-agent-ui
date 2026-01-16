@@ -579,8 +579,8 @@ stihl-agent-ui/
 
 ## Author
 
-**Bruce** - AI Architect  
-Building enterprise AI solutions with Azure, Databricks, and modern web technologies.
+**Bruce Lanskiy** - Data Architect  
+Building enterprise solutions with Azure, Databricks, and modern web technologies.
 
 ---
 
