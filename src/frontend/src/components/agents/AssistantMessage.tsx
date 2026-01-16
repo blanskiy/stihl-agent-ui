@@ -48,7 +48,7 @@ export function AssistantMessage({
           )}
         </span>
       }
-      
+      avatar={<span />}
       className={styles.copilotChatMessage}
       disclaimer={<span>AI-generated content may be incorrect</span>}
       footnote={
