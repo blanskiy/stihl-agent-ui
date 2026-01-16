@@ -1,4 +1,4 @@
-import { Button, Spinner } from "@fluentui/react-components";
+﻿import { Button, Spinner } from "@fluentui/react-components";
 import { bundleIcon, DeleteFilled, DeleteRegular } from "@fluentui/react-icons";
 import { CopilotMessageV2 as CopilotMessage } from "@fluentui-copilot/react-copilot-chat";
 import {
@@ -48,7 +48,25 @@ export function AssistantMessage({
           )}
         </span>
       }
-      avatar={<span />}
+      avatar={
+        <div
+          style={{
+            width: "32px",
+            height: "32px",
+            borderRadius: "50%",
+            backgroundColor: "#F37021",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#ffffff",
+            fontWeight: "bold",
+            fontSize: "16px",
+            fontFamily: "Segoe UI, sans-serif",
+          }}
+        >
+          S
+        </div>
+      }
       className={styles.copilotChatMessage}
       disclaimer={<span>AI-generated content may be incorrect</span>}
       footnote={
