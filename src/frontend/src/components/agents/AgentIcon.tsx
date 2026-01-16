@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+﻿import type { ReactNode } from "react";
 
 import styles from "./AgentIcon.module.css";
 
@@ -9,9 +9,6 @@ export interface IAgentIconProps {
   iconName?: string;
   /**
    * Alt text for the icon
-   * This is used for accessibility and SEO purposes
-   * and should describe the icon's purpose or meaning.
-   * If the icon is purely decorative, a blank string can be used.
    */
   alt: string;
   /**
@@ -25,6 +22,31 @@ export function AgentIcon({
   iconClassName,
   alt = "",
 }: IAgentIconProps): ReactNode {
+  // Render orange "S" circle for STIHL branding
+  if (iconName === "stihl-logo.png") {
+    return (
+      <div className={styles.iconContainer}>
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            borderRadius: "50%",
+            backgroundColor: "#F37021",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#ffffff",
+            fontWeight: "bold",
+            fontSize: "16px",
+            fontFamily: "Segoe UI, sans-serif",
+          }}
+        >
+          S
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.iconContainer}>
       <img
@@ -35,3 +57,5 @@ export function AgentIcon({
     </div>
   );
 }
+
+
