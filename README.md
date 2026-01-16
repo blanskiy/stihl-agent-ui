@@ -64,6 +64,7 @@ Seven specialized skills covering sales analysis, inventory management, product 
 ### High-Level System Architecture
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#0078D4', 'primaryTextColor': '#ffffff', 'primaryBorderColor': '#0078D4', 'lineColor': '#505050', 'secondaryColor': '#E8E8E8', 'tertiaryColor': '#F3F2F1', 'fontFamily': 'Segoe UI, sans-serif'}}}%%
 flowchart TB
     subgraph Client["Client Layer"]
         UI[React Frontend<br/>Fluent UI]
@@ -92,11 +93,25 @@ flowchart TB
     FC --> RAG
     SQL --> Warehouse
     RAG --> Vector
+
+    style Client fill:#F3F2F1,stroke:#E1DFDD,stroke-width:1px
+    style Azure fill:#F3F2F1,stroke:#E1DFDD,stroke-width:1px
+    style Tools fill:#F3F2F1,stroke:#E1DFDD,stroke-width:1px
+    style Databricks fill:#F3F2F1,stroke:#E1DFDD,stroke-width:1px
+    style UI fill:#DEECF9,stroke:#0078D4,stroke-width:1px,color:#323130
+    style API fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style Router fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style FC fill:#005A6F,stroke:#005A6F,stroke-width:1px,color:#ffffff
+    style SQL fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style RAG fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style Warehouse fill:#005A6F,stroke:#005A6F,stroke-width:1px,color:#ffffff
+    style Vector fill:#005A6F,stroke:#005A6F,stroke-width:1px,color:#ffffff
 ```
 
 ### Request Flow Architecture
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#0078D4', 'primaryTextColor': '#ffffff', 'primaryBorderColor': '#0078D4', 'lineColor': '#505050', 'secondaryColor': '#E8E8E8', 'tertiaryColor': '#F3F2F1', 'fontFamily': 'Segoe UI, sans-serif', 'actorTextColor': '#323130', 'actorBkg': '#DEECF9', 'actorBorder': '#0078D4', 'signalColor': '#505050', 'signalTextColor': '#323130'}}}%%
 sequenceDiagram
     participant U as User
     participant FE as React Frontend
@@ -125,6 +140,7 @@ sequenceDiagram
 ### Detailed Component Architecture
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#0078D4', 'primaryTextColor': '#ffffff', 'primaryBorderColor': '#0078D4', 'lineColor': '#505050', 'secondaryColor': '#E8E8E8', 'tertiaryColor': '#F3F2F1', 'fontFamily': 'Segoe UI, sans-serif'}}}%%
 flowchart TB
     subgraph Frontend["Frontend Layer"]
         React[React 18]
@@ -194,6 +210,48 @@ flowchart TB
     VectorEndpoint --> VectorIndex
     ACA --> FastAPI
     ACR --> ACA
+
+    style Frontend fill:#F3F2F1,stroke:#E1DFDD,stroke-width:1px
+    style Backend fill:#F3F2F1,stroke:#E1DFDD,stroke-width:1px
+    style Azure fill:#F3F2F1,stroke:#E1DFDD,stroke-width:1px
+    style Databricks fill:#F3F2F1,stroke:#E1DFDD,stroke-width:1px
+    style Skills fill:#E8E8E8,stroke:#D1D1D1,stroke-width:1px
+    style ToolRegistry fill:#E8E8E8,stroke:#D1D1D1,stroke-width:1px
+    style SQLTools fill:#DEECF9,stroke:#0078D4,stroke-width:1px
+    style RAGTools fill:#DEECF9,stroke:#0078D4,stroke-width:1px
+    style Unity fill:#E8E8E8,stroke:#D1D1D1,stroke-width:1px
+    style React fill:#DEECF9,stroke:#0078D4,stroke-width:1px,color:#323130
+    style Fluent fill:#DEECF9,stroke:#0078D4,stroke-width:1px,color:#323130
+    style Chat fill:#DEECF9,stroke:#0078D4,stroke-width:1px,color:#323130
+    style FastAPI fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style Gunicorn fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style IA fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style PE fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style SA fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style INV fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style DA fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style FA fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style TA fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style T1 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style T2 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style T3 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style T4 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style T5 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style T6 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style T7 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style T8 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style T9 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style T10 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style T11 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style AOAI fill:#005A6F,stroke:#005A6F,stroke-width:1px,color:#ffffff
+    style ACA fill:#005A6F,stroke:#005A6F,stroke-width:1px,color:#ffffff
+    style ACR fill:#005A6F,stroke:#005A6F,stroke-width:1px,color:#ffffff
+    style Bronze fill:#005A6F,stroke:#005A6F,stroke-width:1px,color:#ffffff
+    style Silver fill:#005A6F,stroke:#005A6F,stroke-width:1px,color:#ffffff
+    style Gold fill:#005A6F,stroke:#005A6F,stroke-width:1px,color:#ffffff
+    style SQLEndpoint fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style VectorEndpoint fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style VectorIndex fill:#005A6F,stroke:#005A6F,stroke-width:1px,color:#ffffff
 ```
 
 ---
@@ -238,6 +296,7 @@ flowchart TB
 The SkillRouter uses pattern matching with confidence scoring to classify user queries and route them to specialized handlers.
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#0078D4', 'primaryTextColor': '#ffffff', 'primaryBorderColor': '#0078D4', 'lineColor': '#505050', 'secondaryColor': '#E8E8E8', 'tertiaryColor': '#F3F2F1', 'fontFamily': 'Segoe UI, sans-serif'}}}%%
 flowchart LR
     Query[User Query] --> Router{SkillRouter}
     Router -->|Pattern Match| S1[insights_advisor<br/>Morning briefings, anomalies]
@@ -247,6 +306,16 @@ flowchart LR
     Router -->|Pattern Match| S5[dealer_analyst<br/>Dealer performance]
     Router -->|Pattern Match| S6[forecast_analyst<br/>Predictions, planning]
     Router -->|Pattern Match| S7[trend_analyst<br/>Patterns, seasonality]
+
+    style Query fill:#DEECF9,stroke:#0078D4,stroke-width:1px,color:#323130
+    style Router fill:#005A6F,stroke:#005A6F,stroke-width:1px,color:#ffffff
+    style S1 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style S2 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style S3 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style S4 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style S5 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style S6 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style S7 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
 ```
 
 ### Tool Descriptions
@@ -272,6 +341,7 @@ flowchart LR
 ### Medallion Architecture
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#0078D4', 'primaryTextColor': '#ffffff', 'primaryBorderColor': '#0078D4', 'lineColor': '#505050', 'secondaryColor': '#E8E8E8', 'tertiaryColor': '#F3F2F1', 'fontFamily': 'Segoe UI, sans-serif'}}}%%
 flowchart LR
     subgraph Sources["Data Sources"]
         S1[Sales Data]
@@ -309,6 +379,28 @@ flowchart LR
     S3 --> B3 --> SV3 --> V1
     S4 --> B4 --> SV4 --> G2
     SV1 --> G2
+
+    style Sources fill:#F3F2F1,stroke:#E1DFDD,stroke-width:1px
+    style Bronze fill:#F3F2F1,stroke:#E1DFDD,stroke-width:1px
+    style Silver fill:#F3F2F1,stroke:#E1DFDD,stroke-width:1px
+    style Gold fill:#F3F2F1,stroke:#E1DFDD,stroke-width:1px
+    style Vector fill:#F3F2F1,stroke:#E1DFDD,stroke-width:1px
+    style S1 fill:#DEECF9,stroke:#0078D4,stroke-width:1px,color:#323130
+    style S2 fill:#DEECF9,stroke:#0078D4,stroke-width:1px,color:#323130
+    style S3 fill:#DEECF9,stroke:#0078D4,stroke-width:1px,color:#323130
+    style S4 fill:#DEECF9,stroke:#0078D4,stroke-width:1px,color:#323130
+    style B1 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style B2 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style B3 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style B4 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style SV1 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style SV2 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style SV3 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style SV4 fill:#0078D4,stroke:#0078D4,stroke-width:1px,color:#ffffff
+    style G1 fill:#005A6F,stroke:#005A6F,stroke-width:1px,color:#ffffff
+    style G2 fill:#005A6F,stroke:#005A6F,stroke-width:1px,color:#ffffff
+    style G3 fill:#005A6F,stroke:#005A6F,stroke-width:1px,color:#ffffff
+    style V1 fill:#005A6F,stroke:#005A6F,stroke-width:1px,color:#ffffff
 ```
 
 ### Data Volumes
@@ -498,5 +590,4 @@ This project is for portfolio demonstration purposes.
 
 ---
 
-*Last Updated: January 15, 2026*
-
+*Last Updated: January 16, 2026*
