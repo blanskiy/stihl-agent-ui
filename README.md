@@ -1,176 +1,501 @@
-# Getting Started with Agents Using Microsoft Foundry
+# STIHL Analytics Agent 🪓
 
-The agent leverages Foundry Agent Service and utilizes file search for knowledge retrieval from uploaded files, enabling it to generate responses with citations. The solution also includes built-in monitoring capabilities with tracing to ensure easier troubleshooting and optimized performance.
+An AI-powered analytics platform for STIHL power equipment data, featuring natural language querying, proactive insights, anomaly detection, and semantic product search.
 
-<div style="text-align:center;">
+[![Azure](https://img.shields.io/badge/Azure-Container%20Apps-0078D4?logo=microsoft-azure)](https://azure.microsoft.com)
+[![Databricks](https://img.shields.io/badge/Databricks-Unity%20Catalog-FF3621?logo=databricks)](https://databricks.com)
+[![OpenAI](https://img.shields.io/badge/Azure%20OpenAI-GPT--4o--mini-412991?logo=openai)](https://azure.microsoft.com/en-us/products/ai-services/openai-service)
+[![React](https://img.shields.io/badge/React-Fluent%20UI-61DAFB?logo=react)](https://react.dev)
 
-[**SOLUTION OVERVIEW**](#solution-overview) \| [**GETTING STARTED**](#getting-started) \| [**LOCAL DEVELOPMENT**](#local-development) \| [**RESOURCE CLEAN-UP**](#resource-clean-up) \| [**GUIDANCE**](#guidance) \| [**TROUBLESHOOTING**](./docs/troubleshooting.md)
+**🔗 Live Demo:** [ca-stihl-rnofgqn7g5tzm.happyrock-6ed25c83.westus2.azurecontainerapps.io](https://ca-stihl-rnofgqn7g5tzm.happyrock-6ed25c83.westus2.azurecontainerapps.io)
 
-</div>
+---
 
-**Note**: With any AI solutions you create using these templates, you are responsible for assessing all associated risks, and for complying with all applicable laws and safety standards. Learn more in the transparency documents for [Agent Service](https://nam06.safelinks.protection.outlook.com/?url=https%3A%2F%2Flearn.microsoft.com%2Fen-us%2Fazure%2Fai-foundry%2Fresponsible-ai%2Fagents%2Ftransparency-note&data=05%7C02%7Chowieleung%40microsoft.com%7C42645ec29da244bd920508de2095bcad%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C638984024651276233%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=Un4HtoksTeodWPQMQp7zh8BNW6j%2BeIw4mcs6gbS4e6E%3D&reserved=0) and [Agent Framework](https://nam06.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Fmicrosoft%2Fagent-framework%2Fblob%2Fmain%2FTRANSPARENCY_FAQ.md&data=05%7C02%7Chowieleung%40microsoft.com%7C42645ec29da244bd920508de2095bcad%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C638984024651325701%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=19nfzxn8ZN1qr7Hy77fn%2BgFXD1sc%2BXiuPuUi3H2NNz4%3D&reserved=0).
+## 📋 Table of Contents
 
-## Solution Overview
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [Architecture](#architecture)
+- [Technology Stack](#technology-stack)
+- [Skills & Tools](#skills--tools)
+- [Data Architecture](#data-architecture)
+- [Getting Started](#getting-started)
+- [Deployment](#deployment)
+- [Demo Queries](#demo-queries)
+- [Project Structure](#project-structure)
+- [Cost Estimates](#cost-estimates)
 
-This solution deploys a web-based chat application with an AI agent running in Azure Container App.
+---
 
-The agent leverages the Foundry Agent Service and utilizes Azure AI Search for knowledge retrieval from uploaded files, enabling it to generate responses with citations. The solution also includes built-in monitoring capabilities with tracing to ensure easier troubleshooting and optimized performance.
+## Overview
 
-This solution creates a Microsoft Foundry project and Foundry Tools. More details about the resources can be found in the [resources](#resources) documentation. There are options to enable logging, tracing, and monitoring.
+The STIHL Analytics Agent is a full-stack AI application that transforms how users interact with business data. Instead of writing SQL queries or navigating dashboards, users simply ask questions in natural language and receive intelligent, contextual responses.
 
-Instructions are provided for deployment through GitHub Codespaces, VS Code Dev Containers, and your local development environment.
+### What Makes This Project Unique
 
-### Solution Architecture
+| Capability | Description |
+|------------|-------------|
+| **Proactive Insights** | Automatically surfaces anomalies and important trends without being asked |
+| **Hybrid Intelligence** | Combines structured SQL queries with semantic vector search |
+| **Skill-Based Routing** | Intelligent query classification routes requests to specialized handlers |
+| **Real-Time Data** | Queries live Databricks warehouse—no cached or mock responses |
+| **Production-Ready** | Fully containerized and deployed on Azure Container Apps |
 
-![Architecture diagram showing that user input is provided to the Azure Container App, which contains the app code. With user identity and resource access through managed identity, the input is used to form a response. The input and the Azure monitor are able to use the Azure resources deployed in the solution: Application Insights, Microsoft Foundry Project, Foundry Tools, Storage account, Azure Container App, and Log Analytics Workspace.](docs/images/architecture.png)
+---
 
-The app code runs in an Azure Container App to process user input and generate a response to the user. It leverages Microsoft Foundry projects and Foundry Tools, including the model and agent.
+## Key Features
 
-### Key Features
+### 🎯 Natural Language Analytics
+Ask questions like "What are our top selling products in California?" and get instant answers with real data.
 
-- **[Knowledge Retrieval](./docs/deploy_customization.md#enabling-and-disabling-resources-provision)**<br/>
-The AI agent uses file search or Azure AI Search to retrieve knowledge from uploaded files.
+### 🔍 Semantic Product Search
+Uses vector embeddings (BGE-Large) to understand product queries contextually. "Best chainsaw for professionals" returns relevant products based on meaning, not just keywords.
 
-- **[Customizable AI Model Deployment](./docs/deploy_customization.md#customizing-model-deployments)**<br/>
-The solution allows users to configure and deploy AI models, defaulting to gpt-5-mini, with options to adjust model capacity and knowledge retrieval methods.
+### ⚠️ Anomaly Detection
+Proactively identifies unusual patterns in sales, inventory, and dealer performance, surfacing them in morning briefings.
 
-- **[Built-in Monitoring and Tracing](./docs/observability.md#tracing-and-monitoring)**<br/>
-Integrated monitoring capabilities, including Azure Monitor and Application Insights, enable tracing and logging for easier troubleshooting and performance optimization.
+### 📊 Multi-Domain Intelligence
+Seven specialized skills covering sales analysis, inventory management, product expertise, dealer performance, forecasting, and trend analysis.
 
-- **[Flexible Deployment Options](./docs/deployment.md)**<br/>
-The solution supports deployment through GitHub Codespaces, VS Code Dev Containers, or local environments, providing flexibility for different development workflows.
+---
 
-- **[Continuous Evaluation](./docs/observability.md#continuous-evaluation)**<br/>
-Proactively monitor and assess your agent's performance over time with continuous evaluation that automatically checks real-world interactions to identify potential issues before they impact users.
+## Architecture
 
-- **[Agent Evaluation](./docs/observability.md#agent-evaluation)**<br/>
-This solution demonstrates how you can evaluate your agent's performance and quality through Pytest.
+### High-Level System Architecture
 
-- **[AI Red Teaming Agent](./docs/observability.md#ai-red-teaming-agent)**<br/>
-Facilitates the creation of an AI Red Teaming Agent through Pytest that can run batch automated scans for safety and security on your Agent solution to check your risk posture before deploying it into production.
+```mermaid
+flowchart TB
+    subgraph Client["Client Layer"]
+        UI[React Frontend<br/>Fluent UI]
+    end
 
-<br/>
+    subgraph Azure["Azure Container Apps"]
+        API[FastAPI Backend<br/>Gunicorn + Uvicorn]
+        Router[SkillRouter<br/>7 Skills]
+        FC[Azure OpenAI<br/>Function Calling]
+    end
 
-Here is a screenshot showing the chatting web application with requests and responses between the system and the user:
+    subgraph Tools["Tool Layer"]
+        SQL[SQL Tools<br/>8 Functions]
+        RAG[RAG Tools<br/>3 Functions]
+    end
 
-![Screenshot of chatting web application showing requests and responses between agent and the user.](docs/images/webapp_screenshot.png)
+    subgraph Databricks["Databricks Platform"]
+        Warehouse[(SQL Warehouse<br/>Unity Catalog)]
+        Vector[(Vector Search<br/>BGE-Large)]
+    end
+
+    UI -->|SSE Streaming| API
+    API --> Router
+    Router --> FC
+    FC --> SQL
+    FC --> RAG
+    SQL --> Warehouse
+    RAG --> Vector
+```
+
+### Request Flow Architecture
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant FE as React Frontend
+    participant API as FastAPI
+    participant SR as SkillRouter
+    participant AOAI as Azure OpenAI
+    participant Tools as Tool Functions
+    participant DB as Databricks
+
+    U->>FE: "Top selling products?"
+    FE->>API: POST /chat (SSE)
+    API->>SR: classify_query()
+    SR-->>API: skill: sales_analyst
+    API->>AOAI: Chat completion + tools
+    AOAI-->>API: tool_call: query_sales
+    API->>Tools: execute query_sales()
+    Tools->>DB: SQL Query
+    DB-->>Tools: Results
+    Tools-->>API: Formatted response
+    API->>AOAI: Tool result
+    AOAI-->>API: Natural language answer
+    API-->>FE: Stream response
+    FE-->>U: Display answer
+```
+
+### Detailed Component Architecture
+
+```mermaid
+flowchart TB
+    subgraph Frontend["Frontend Layer"]
+        React[React 18]
+        Fluent[Fluent UI v9]
+        Chat[Chat Component<br/>SSE Streaming]
+    end
+
+    subgraph Backend["Backend Layer"]
+        FastAPI[FastAPI<br/>REST API]
+        Gunicorn[Gunicorn<br/>Process Manager]
+        
+        subgraph Skills["Skills Framework"]
+            IA[insights_advisor]
+            PE[product_expert]
+            SA[sales_analyst]
+            INV[inventory_analyst]
+            DA[dealer_analyst]
+            FA[forecast_analyst]
+            TA[trend_analyst]
+        end
+        
+        subgraph ToolRegistry["Tool Registry (11 Tools)"]
+            subgraph SQLTools["SQL Tools"]
+                T1[query_sales]
+                T2[query_inventory]
+                T3[get_insights]
+                T4[detect_anomalies]
+                T5[get_briefing]
+                T6[query_dealer]
+                T7[get_forecast]
+                T8[analyze_trends]
+            end
+            subgraph RAGTools["RAG Tools"]
+                T9[search_products]
+                T10[compare_products]
+                T11[get_recommendations]
+            end
+        end
+    end
+
+    subgraph Azure["Azure Services"]
+        AOAI[Azure OpenAI<br/>gpt-4o-mini]
+        ACA[Container Apps]
+        ACR[Container Registry]
+    end
+
+    subgraph Databricks["Databricks Platform"]
+        subgraph Unity["Unity Catalog"]
+            Bronze[(Bronze Layer<br/>Raw Data)]
+            Silver[(Silver Layer<br/>Cleaned Data)]
+            Gold[(Gold Layer<br/>Analytics)]
+        end
+        SQLEndpoint[SQL Warehouse]
+        VectorEndpoint[Vector Search<br/>Endpoint]
+        VectorIndex[(Product Index<br/>BGE-Large)]
+    end
+
+    React --> Chat
+    Fluent --> React
+    Chat -->|HTTP/SSE| FastAPI
+    FastAPI --> Skills
+    Skills --> ToolRegistry
+    ToolRegistry --> AOAI
+    SQLTools --> SQLEndpoint
+    RAGTools --> VectorEndpoint
+    SQLEndpoint --> Unity
+    VectorEndpoint --> VectorIndex
+    ACA --> FastAPI
+    ACR --> ACA
+```
+
+---
+
+## Technology Stack
+
+### Frontend
+| Technology | Purpose |
+|------------|---------|
+| React 18 | UI Framework |
+| Fluent UI v9 | Microsoft Design System |
+| TypeScript | Type Safety |
+| Vite | Build Tool |
+| SSE (Server-Sent Events) | Real-time Streaming |
+
+### Backend
+| Technology | Purpose |
+|------------|---------|
+| Python 3.11 | Runtime |
+| FastAPI | REST API Framework |
+| Gunicorn + Uvicorn | Production Server |
+| Azure OpenAI SDK | LLM Integration |
+| databricks-sql-connector | Warehouse Access |
+| databricks-vectorsearch | Semantic Search |
+
+### Infrastructure
+| Service | Purpose |
+|---------|---------|
+| Azure Container Apps | Application Hosting |
+| Azure Container Registry | Image Storage |
+| Azure OpenAI | GPT-4o-mini Model |
+| Databricks SQL Warehouse | Data Warehouse |
+| Databricks Vector Search | Embeddings Search |
+| Unity Catalog | Data Governance |
+
+---
+
+## Skills & Tools
+
+### Skills Framework
+
+The SkillRouter uses pattern matching with confidence scoring to classify user queries and route them to specialized handlers.
+
+```mermaid
+flowchart LR
+    Query[User Query] --> Router{SkillRouter}
+    Router -->|Pattern Match| S1[insights_advisor<br/>Morning briefings, anomalies]
+    Router -->|Pattern Match| S2[product_expert<br/>Product info, comparisons]
+    Router -->|Pattern Match| S3[sales_analyst<br/>Revenue, top sellers]
+    Router -->|Pattern Match| S4[inventory_analyst<br/>Stock levels, reorder]
+    Router -->|Pattern Match| S5[dealer_analyst<br/>Dealer performance]
+    Router -->|Pattern Match| S6[forecast_analyst<br/>Predictions, planning]
+    Router -->|Pattern Match| S7[trend_analyst<br/>Patterns, seasonality]
+```
+
+### Tool Descriptions
+
+| Tool | Type | Description |
+|------|------|-------------|
+| `query_sales` | SQL | Query sales transactions with filters |
+| `query_inventory` | SQL | Check stock levels and inventory status |
+| `get_insights` | SQL | Retrieve pre-computed business insights |
+| `detect_anomalies` | SQL | Find unusual patterns in data |
+| `get_briefing` | SQL | Generate executive summaries |
+| `query_dealer` | SQL | Analyze dealer performance metrics |
+| `get_forecast` | SQL | Retrieve demand forecasts |
+| `analyze_trends` | SQL | Identify seasonal and temporal patterns |
+| `search_products` | RAG | Semantic product search |
+| `compare_products` | RAG | Side-by-side product comparison |
+| `get_recommendations` | RAG | AI-powered product suggestions |
+
+---
+
+## Data Architecture
+
+### Medallion Architecture
+
+```mermaid
+flowchart LR
+    subgraph Sources["Data Sources"]
+        S1[Sales Data]
+        S2[Inventory Data]
+        S3[Product Catalog]
+        S4[Dealer Data]
+    end
+
+    subgraph Bronze["Bronze Layer<br/>(Raw)"]
+        B1[(bronze.sales_raw)]
+        B2[(bronze.inventory_raw)]
+        B3[(bronze.products_raw)]
+        B4[(bronze.dealers_raw)]
+    end
+
+    subgraph Silver["Silver Layer<br/>(Cleaned)"]
+        SV1[(silver.sales)]
+        SV2[(silver.inventory)]
+        SV3[(silver.products)]
+        SV4[(silver.dealers)]
+    end
+
+    subgraph Gold["Gold Layer<br/>(Analytics)"]
+        G1[(gold.proactive_insights)]
+        G2[(gold.sales_summary)]
+        G3[(gold.inventory_alerts)]
+    end
+
+    subgraph Vector["Vector Index"]
+        V1[(product_index<br/>BGE-Large Embeddings)]
+    end
+
+    S1 --> B1 --> SV1 --> G1
+    S2 --> B2 --> SV2 --> G3
+    S3 --> B3 --> SV3 --> V1
+    S4 --> B4 --> SV4 --> G2
+    SV1 --> G2
+```
+
+### Data Volumes
+
+| Layer | Table | Record Count |
+|-------|-------|--------------|
+| Silver | sales | 562,000+ |
+| Silver | inventory | 126,000+ |
+| Silver | products | 500+ |
+| Gold | proactive_insights | Dynamic |
+
+---
 
 ## Getting Started
 
-| [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Azure-Samples/get-started-with-ai-agents) | [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/Azure-Samples/get-started-with-ai-agents) |
-|---|---|
+### Prerequisites
 
-1. Click `Open in GitHub Codespaces` or `Dev Containers` button above
-2. Wait for the environment to load
-3. Run the following commands in the terminal:
-   ```bash
-   azd up
-   ```
-4. Follow the prompts to select your Azure subscription and region
-5. Wait for deployment to complete (5-20 minutes) - you'll get a web app URL when finished
+- Python 3.11+
+- Node.js 18+
+- Azure subscription
+- Databricks workspace with Unity Catalog
+- Azure OpenAI deployment (gpt-4o-mini)
 
-For detailed deployment options and troubleshooting, see the [full deployment guide](./docs/deployment.md).
-**After deployment, try these [sample questions](./docs/sample_questions.md) to test your agent.**
+### Environment Variables
 
-## Local Development
+Create a `.env` file with:
 
-For developers who want to run the application locally or customize the agent:
+```env
+# Azure OpenAI
+AZURE_OPENAI_ENDPOINT=https://your-endpoint.openai.azure.com/
+AZURE_OPENAI_API_KEY=your-api-key
+AZURE_OPENAI_DEPLOYMENT_GPT=gpt-4o-mini
 
-- **[Local Development Guide](./docs/local_development.md)** - Set up a local development environment, customize the frontend (starting with AgentPreview.tsx), modify agent instructions and tools, and use evaluation to improve your code.
+# Databricks
+DATABRICKS_HOST=https://your-workspace.azuredatabricks.net
+DATABRICKS_HTTP_PATH=/sql/1.0/warehouses/your-warehouse-id
+DATABRICKS_TOKEN=your-databricks-pat
+DATABRICKS_CATALOG=stihl_lakehouse
 
-This guide covers:
-- Environment setup and prerequisites
-- Running the development server locally
-- Frontend customization and backend communication
-- Agent instructions and tools modification
-- File management and agent recreation
-- Using agent evaluation for code improvement
+# Vector Search
+DATABRICKS_VECTOR_SEARCH_ENDPOINT=stihl-vector-endpoint
+DATABRICKS_VECTOR_INDEX=product_index
+```
 
+### Local Development
 
-## Resource Clean-up
+```bash
+# Clone repository
+git clone https://github.com/blanskiy/stihl-agent-ui.git
+cd stihl-agent-ui
 
-To prevent incurring unnecessary charges, it's important to clean up your Azure resources after completing your work with the application.
+# Backend setup
+cd src/api
+python -m venv .venv
+.venv\Scripts\activate  # Windows
+pip install -r ../requirements.txt
+uvicorn main:app --reload --port 8000
 
-- **When to Clean Up:**
-  - After you have finished testing or demonstrating the application.
-  - If the application is no longer needed or you have transitioned to a different project or environment.
-  - When you have completed development and are ready to decommission the application.
+# Frontend setup (new terminal)
+cd src/frontend
+npm install
+npm run dev
+```
 
-- **Deleting Resources:**
-  To delete all associated resources and shut down the application, execute the following command:
-  
-    ```bash
-    azd down
-    ```
+Access the application at `http://localhost:5173`
 
-    Please note that this process may take up to 20 minutes to complete.
+---
 
-⚠️ Alternatively, you can delete the resource group directly from the Azure Portal to clean up resources.
+## Deployment
 
-## Guidance
+### Azure Container Apps Deployment
 
-### Costs
+```bash
+# Login to Azure
+az login
+azd auth login
 
-Pricing varies per region and usage, so it isn't possible to predict exact costs for your usage.
-The majority of the Azure resources used in this infrastructure are on usage-based pricing tiers.
+# Initialize environment
+azd init
+azd env new stihl-prod
 
-You can try the [Azure pricing calculator](https://azure.microsoft.com/pricing/calculator) for the resources:
+# Set environment variables
+azd env set AZURE_OPENAI_ENDPOINT "your-endpoint"
+azd env set DATABRICKS_HOST "your-host"
+# ... set all required variables
 
-- **Microsoft Foundry**: Free tier. [Pricing](https://azure.microsoft.com/pricing/details/ai-studio/)  
-- **Azure Storage Account**: Standard tier, LRS. Pricing is based on storage and operations. [Pricing](https://azure.microsoft.com/pricing/details/storage/blobs/)  
-- **Foundry Tools**: S0 tier, defaults to gpt-5-mini. Pricing is based on token count. [Pricing](https://azure.microsoft.com/pricing/details/cognitive-services/)  
-- **Azure Container App**: Consumption tier with 0.5 CPU, 1GiB memory/storage. Pricing is based on resource allocation, and each month allows for a certain amount of free usage. [Pricing](https://azure.microsoft.com/pricing/details/container-apps/)  
-- **Log analytics**: Pay-as-you-go tier. Costs based on data ingested. [Pricing](https://azure.microsoft.com/pricing/details/monitor/)  
-- **Agent Evaluations**: Incurs the cost of your provided model deployment used for local evaluations.  
-- **AI Red Teaming Agent**: Leverages Azure AI Risk and Safety Evaluations to assess attack success from the automated AI red teaming scan. Users are billed based on the consumption of Risk and Safety Evaluations as listed in [our Azure pricing page](https://azure.microsoft.com/pricing/details/ai-foundry/). Click on the tab labeled “Complete AI Toolchain” to view the pricing details.
+# Deploy
+azd deploy
+```
 
-⚠️ To avoid unnecessary costs, remember to take down your app if it's no longer in use,
-either by deleting the resource group in the Portal or running `azd down`.
+### View Logs
 
-### Security guidelines
+```bash
+az containerapp logs show \
+  --name ca-stihl-rnofgqn7g5tzm \
+  --resource-group rg-ai-foundry-learning \
+  --type console \
+  --tail 100
+```
 
-This template also uses [Managed Identity](https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/overview) for local development and deployment.
+---
 
-To ensure continued best practices in your own repository, we recommend that anyone creating solutions based on our templates ensure that the [Github secret scanning](https://docs.github.com/code-security/secret-scanning/about-secret-scanning) setting is enabled.
+## Demo Queries
 
-You may want to consider additional security measures, such as:
+Try these queries to explore the agent's capabilities:
 
-- Enabling Microsoft Defender for Cloud to [secure your Azure resources](https://learn.microsoft.com/azure/defender-for-cloud/).
-- Protecting the Azure Container Apps instance with a [firewall](https://learn.microsoft.com/azure/container-apps/waf-app-gateway) and/or [Virtual Network](https://learn.microsoft.com/azure/container-apps/networking?tabs=workload-profiles-env%2Cazure-cli).
+| Query | Skill Activated | What It Demonstrates |
+|-------|-----------------|----------------------|
+| "Good morning! What should I know today?" | insights_advisor | Proactive anomaly detection |
+| "What are the top selling products?" | sales_analyst | SQL aggregation queries |
+| "Best chainsaw for professionals?" | product_expert | RAG/Vector search |
+| "Compare MS 500i vs MS 462" | product_expert | Product comparison |
+| "Low stock items that need reordering?" | inventory_analyst | Inventory alerts |
+| "How is dealer performance in California?" | dealer_analyst | Regional analysis |
+| "What are the seasonal trends for trimmers?" | trend_analyst | Time-series analysis |
 
-> **Important Security Notice** <br/>
-This template, the application code and configuration it contains, has been built to showcase Microsoft Azure specific services and tools. We strongly advise our customers not to make this code part of their production environments without implementing or enabling additional security features.  <br/><br/>
-For a more comprehensive list of best practices and security recommendations for Intelligent Applications, [visit our official documentation](https://learn.microsoft.com/azure/ai-foundry/).
+---
 
-### Resources
+## Project Structure
 
-This template creates everything you need to get started with Microsoft Foundry:
+```
+stihl-agent-ui/
+├── src/
+│   ├── api/
+│   │   ├── agent/
+│   │   │   ├── skills/
+│   │   │   │   └── router.py          # SkillRouter implementation
+│   │   │   └── tools/
+│   │   │       ├── sql_tools.py       # SQL query tools
+│   │   │       └── rag_tools.py       # Vector search tools
+│   │   ├── routes.py                  # API endpoints
+│   │   └── main.py                    # FastAPI application
+│   ├── frontend/
+│   │   ├── src/
+│   │   │   ├── components/            # React components
+│   │   │   └── App.tsx                # Main application
+│   │   └── package.json
+│   ├── Dockerfile                     # Container configuration
+│   ├── requirements.txt               # Python dependencies
+│   └── gunicorn.conf.py              # Production server config
+├── infra/
+│   └── main.bicep                     # Azure infrastructure as code
+└── README.md
+```
 
-| Resource | Description |
-|----------|-------------|
-| [Azure AI Project](https://learn.microsoft.com/azure/ai-studio/how-to/create-projects) | Provides a collaborative workspace for AI development with access to models, data, and compute resources |
-| [Azure OpenAI Service](https://learn.microsoft.com/azure/ai-services/openai/) | Powers the AI agents for conversational AI and intelligent search capabilities. Default models deployed are gpt-5-mini, but any Azure AI models can be specified per the [documentation](docs/deploy_customization.md#customizing-model-deployments) |
-| [Azure Container Apps](https://learn.microsoft.com/azure/container-apps/) | Hosts and scales the web application with serverless containers |
-| [Azure Container Registry](https://learn.microsoft.com/azure/container-registry/) | Stores and manages container images for secure deployment |
-| [Storage Account](https://learn.microsoft.com/azure/storage/blobs/) | Provides blob storage for application data and file uploads |
-| [Blob Storage](https://learn.microsoft.com/azure/storage/blobs/) | Container (`documents`) used for uploaded files that feed AI Search |
-| [AI Search Service](https://learn.microsoft.com/azure/search/) | *Optional* - Enables hybrid search capabilities combining semantic and vector search |
-| [Application Insights](https://learn.microsoft.com/azure/azure-monitor/app/app-insights-overview) | *Optional* - Provides application performance monitoring, logging, and telemetry for debugging and optimization |
-| [Log Analytics Workspace](https://learn.microsoft.com/azure/azure-monitor/logs/log-analytics-workspace-overview) | *Optional* - Collects and analyzes telemetry data for monitoring and troubleshooting |
+---
 
-## Troubleshooting
+## Cost Estimates
 
-For solutions to common deployment, container app, and agent issues, see the [Troubleshooting Guide](./docs/troubleshooting.md).
+### Monthly Azure Costs
 
+| Service | Estimated Cost |
+|---------|----------------|
+| Container Apps (Consumption) | $15-30 |
+| Container Registry | $5 |
+| Log Analytics | $5 |
+| **Total Azure** | **~$25-40/month** |
 
-## Disclaimers
+### Databricks Costs (Separate)
 
-To the extent that the Software includes components or code used in or derived from Microsoft products or services, including without limitation Microsoft Azure Services (collectively, “Microsoft Products and Services”), you must also comply with the Product Terms applicable to such Microsoft Products and Services. You acknowledge and agree that the license governing the Software does not grant you a license or other right to use Microsoft Products and Services. Nothing in the license or this ReadMe file will serve to supersede, amend, terminate or modify any terms in the Product Terms for any Microsoft Products and Services.
+- SQL Warehouse: Pay per query (DBU consumption)
+- Vector Search: Included with Unity Catalog
 
-You must also comply with all domestic and international export laws and regulations that apply to the Software, which include restrictions on destinations, end users, and end use. For further information on export restrictions, visit <https://aka.ms/exporting>.
+---
 
-You acknowledge that the Software and Microsoft Products and Services (1) are not designed, intended or made available as a medical device(s), and (2) are not designed or intended to be a substitute for professional medical advice, diagnosis, treatment, or judgment and should not be used to replace or as a substitute for professional medical advice, diagnosis, treatment, or judgment. Customer is solely responsible for displaying and/or obtaining appropriate consents, warnings, disclaimers, and acknowledgements to end users of Customer’s implementation of the Online Services.
+## Future Enhancements
 
-You acknowledge the Software is not subject to SOC 1 and SOC 2 compliance audits. No Microsoft technology, nor any of its component technologies, including the Software, is intended or made available as a substitute for the professional advice, opinion, or judgement of a certified financial services professional. Do not use the Software to replace, substitute, or provide professional financial advice or judgment.  
+- [ ] Azure AD B2C Authentication
+- [ ] Application Insights Monitoring
+- [ ] Multi-turn Conversation Memory
+- [ ] Export Reports to PDF/Excel
+- [ ] Mobile-Responsive Design
+- [ ] Dark Mode Support
 
-BY ACCESSING OR USING THE SOFTWARE, YOU ACKNOWLEDGE THAT THE SOFTWARE IS NOT DESIGNED OR INTENDED TO SUPPORT ANY USE IN WHICH A SERVICE INTERRUPTION, DEFECT, ERROR, OR OTHER FAILURE OF THE SOFTWARE COULD RESULT IN THE DEATH OR SERIOUS BODILY INJURY OF ANY PERSON OR IN PHYSICAL OR ENVIRONMENTAL DAMAGE (COLLECTIVELY, “HIGH-RISK USE”), AND THAT YOU WILL ENSURE THAT, IN THE EVENT OF ANY INTERRUPTION, DEFECT, ERROR, OR OTHER FAILURE OF THE SOFTWARE, THE SAFETY OF PEOPLE, PROPERTY, AND THE ENVIRONMENT ARE NOT REDUCED BELOW A LEVEL THAT IS REASONABLY, APPROPRIATE, AND LEGAL, WHETHER IN GENERAL OR IN A SPECIFIC INDUSTRY. BY ACCESSING THE SOFTWARE, YOU FURTHER ACKNOWLEDGE THAT YOUR HIGH-RISK USE OF THE SOFTWARE IS AT YOUR OWN RISK.
+---
+
+## Author
+
+**Bruce** - AI Architect  
+Building enterprise AI solutions with Azure, Databricks, and modern web technologies.
+
+---
+
+## License
+
+This project is for portfolio demonstration purposes.
+
+---
+
+*Last Updated: January 15, 2026*
