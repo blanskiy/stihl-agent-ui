@@ -12,13 +12,11 @@ import { UsageInfo } from "./UsageInfo";
 import { IAssistantMessageProps } from "./chatbot/types";
 
 import styles from "./AgentPreviewChatBot.module.css";
-import { AgentIcon } from "./AgentIcon";
 
 const DeleteIcon = bundleIcon(DeleteFilled, DeleteRegular);
 
 export function AssistantMessage({
   message,
-  agentLogo,
   loadingState,
   agentName,
   showUsageInfo,
@@ -50,7 +48,7 @@ export function AssistantMessage({
           )}
         </span>
       }
-      avatar={null}
+      
       className={styles.copilotChatMessage}
       disclaimer={<span>AI-generated content may be incorrect</span>}
       footnote={
