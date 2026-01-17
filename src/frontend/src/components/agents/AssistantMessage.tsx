@@ -68,7 +68,7 @@ export function AssistantMessage({
         </div>
       }
       className={styles.copilotChatMessage}
-      disclaimer={undefined}
+      disclaimer={null}
       footnote={
         <>
           {hasAnnotations && (
