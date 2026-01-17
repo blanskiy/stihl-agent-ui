@@ -68,7 +68,7 @@ export function AssistantMessage({
         </div>
       }
       className={styles.copilotChatMessage}
-      disclaimer={<span>AI-generated content may be incorrect</span>}
+      disclaimer={undefined}
       footnote={
         <>
           {hasAnnotations && (
@@ -101,3 +101,5 @@ export function AssistantMessage({
     </CopilotMessage>
   );
 }
+
+
