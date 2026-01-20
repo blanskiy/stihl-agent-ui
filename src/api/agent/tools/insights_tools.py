@@ -30,129 +30,115 @@ def get_proactive_insights(
     Returns:
         JSON with prioritized insights
     """
+    # Always generate realtime insights from current data
+    # This ensures users see current inventory status, not historical anomalies
+    return _generate_realtime_insights(max_insights, insight_types, severity_filter)
+
+
+def _generate_realtime_insights(
+    max_insights: int = 5,
+    insight_types: Optional[list[str]] = None,
+    severity_filter: Optional[str] = None
+) -> str:
+    """Generate insights on-the-fly from CURRENT data (not historical anomalies)."""
     config = get_config()
     catalog = config.databricks.catalog
-    
-    # Check if proactive_insights table exists, if not generate insights on-the-fly
-    try:
-        insights_table = f"{catalog}.gold.proactive_insights"
-        
-        filters = ["is_active = true"]
-        if insight_types:
-            types_str = ", ".join([f"'{t}'" for t in insight_types])
-            filters.append(f"insight_type IN ({types_str})")
-        if severity_filter:
-            filters.append(f"severity = '{severity_filter}'")
-        filter_clause = " AND ".join(filters)
 
-        query = f"""
-        SELECT 
-            insight_id, insight_type, severity, title, description,
-            affected_entity, metric_name, metric_value, expected_value,
-            deviation_pct, detected_at, recommended_action
-        FROM {insights_table}
-        WHERE {filter_clause}
-        ORDER BY 
-            CASE severity WHEN 'critical' THEN 1 WHEN 'warning' THEN 2 ELSE 3 END,
-            ABS(deviation_pct) DESC
-        LIMIT {max_insights}
-        """
-
-        result = execute_query(query)
-        
-        if result.get("success") and result.get("data"):
-            result["narrative_summary"] = _format_insights_narrative(result["data"])
-            return json.dumps(result, default=str)
-    except:
-        pass
-    
-    # Fallback: Generate insights from current data
-    return _generate_realtime_insights(max_insights)
-
-
-def _generate_realtime_insights(max_insights: int = 5) -> str:
-    """Generate insights on-the-fly from current data."""
-    config = get_config()
-    catalog = config.databricks.catalog
-    
     insights = []
-    
-    # Check for stockouts
-    stockout_query = f"""
-    SELECT product_name, category, region, COUNT(*) as locations
-    FROM {catalog}.gold.inventory_status
-    WHERE quantity_on_hand = 0
-    GROUP BY product_name, category, region
-    ORDER BY locations DESC
-    LIMIT 3
-    """
-    stockout_result = execute_query(stockout_query)
-    if stockout_result.get("success") and stockout_result.get("data"):
-        for row in stockout_result["data"]:
-            insights.append({
-                "insight_type": "stockout_risk",
-                "severity": "critical",
-                "title": f"STOCKOUT: {row['product_name']}",
-                "description": f"{row['product_name']} is out of stock in {row['region']}",
-                "affected_entity": row["product_name"],
-                "recommended_action": f"Reorder {row['product_name']} immediately"
-            })
-    
-    # Check for critical inventory (using uppercase status)
-    critical_query = f"""
-    SELECT product_name, category, region, days_of_supply, quantity_on_hand
-    FROM {catalog}.gold.inventory_status
-    WHERE status = 'CRITICAL' AND quantity_on_hand > 0
-    ORDER BY days_of_supply ASC
-    LIMIT 3
-    """
-    critical_result = execute_query(critical_query)
-    if critical_result.get("success") and critical_result.get("data"):
-        for row in critical_result["data"]:
-            insights.append({
-                "insight_type": "stockout_risk",
-                "severity": "warning",
-                "title": f"Critical Stock: {row['product_name']}",
-                "description": f"{row['product_name']} has only {row['days_of_supply']:.0f} days of supply in {row['region']}",
-                "affected_entity": row["product_name"],
-                "metric_value": row["days_of_supply"],
-                "recommended_action": f"Review reorder for {row['product_name']}"
-            })
-    
-    # Check for sales anomalies - get most recent month with data
-    sales_query = f"""
-    WITH recent_month AS (
-        SELECT MAX(year * 100 + month) as max_period FROM {catalog}.gold.monthly_sales
-    )
-    SELECT category, region, SUM(total_revenue) as revenue, SUM(total_units) as units
-    FROM {catalog}.gold.monthly_sales m, recent_month r
-    WHERE m.year * 100 + m.month = r.max_period
-    GROUP BY category, region
-    ORDER BY revenue DESC
-    LIMIT 2
-    """
-    sales_result = execute_query(sales_query)
-    if sales_result.get("success") and sales_result.get("data"):
-        for row in sales_result["data"]:
-            insights.append({
-                "insight_type": "opportunity",
-                "severity": "info",
-                "title": f"Strong Sales: {row['category']} in {row['region']}",
-                "description": f"{row['category']} generated ${row['revenue']:,.0f} in {row['region']}",
-                "affected_entity": row["category"],
-                "metric_value": row["revenue"],
-                "recommended_action": "Consider increasing inventory for this category"
-            })
-    
+
+    # Check for stockouts (critical severity)
+    if not insight_types or "stockout_risk" in insight_types:
+        if not severity_filter or severity_filter == "critical":
+            stockout_query = f"""
+            SELECT product_name, category, region, COUNT(*) as locations
+            FROM {catalog}.gold.inventory_status
+            WHERE quantity_on_hand = 0
+            GROUP BY product_name, category, region
+            ORDER BY locations DESC
+            LIMIT 3
+            """
+            stockout_result = execute_query(stockout_query)
+            if stockout_result.get("success") and stockout_result.get("data"):
+                for row in stockout_result["data"]:
+                    insights.append({
+                        "insight_type": "stockout_risk",
+                        "severity": "critical",
+                        "title": f"STOCKOUT: {row['product_name']}",
+                        "description": f"{row['product_name']} is out of stock in {row['region']}",
+                        "affected_entity": row["product_name"],
+                        "recommended_action": f"Reorder {row['product_name']} immediately",
+                        "data_source": "current_inventory"
+                    })
+
+    # Check for critical inventory (case-insensitive status match)
+    if not insight_types or "stockout_risk" in insight_types:
+        if not severity_filter or severity_filter in ["critical", "warning"]:
+            critical_query = f"""
+            SELECT product_name, category, region, days_of_supply, quantity_on_hand
+            FROM {catalog}.gold.inventory_status
+            WHERE UPPER(status) = 'CRITICAL' AND quantity_on_hand > 0
+            ORDER BY days_of_supply ASC
+            LIMIT 3
+            """
+            critical_result = execute_query(critical_query)
+            if critical_result.get("success") and critical_result.get("data"):
+                for row in critical_result["data"]:
+                    insights.append({
+                        "insight_type": "stockout_risk",
+                        "severity": "warning",
+                        "title": f"Critical Stock: {row['product_name']}",
+                        "description": f"{row['product_name']} has only {row['days_of_supply']:.0f} days of supply in {row['region']}",
+                        "affected_entity": row["product_name"],
+                        "metric_value": row["days_of_supply"],
+                        "recommended_action": f"Review reorder for {row['product_name']}",
+                        "data_source": "current_inventory"
+                    })
+
+    # Check for sales performance - get most recent month with data
+    if not insight_types or "opportunity" in insight_types:
+        if not severity_filter or severity_filter == "info":
+            sales_query = f"""
+            WITH recent_month AS (
+                SELECT MAX(year) as max_year,
+                       MAX(CASE WHEN year = (SELECT MAX(year) FROM {catalog}.gold.monthly_sales) THEN month ELSE 0 END) as max_month
+                FROM {catalog}.gold.monthly_sales
+            )
+            SELECT m.category, m.region, SUM(m.total_revenue) as revenue, SUM(m.total_units) as units,
+                   r.max_year, r.max_month
+            FROM {catalog}.gold.monthly_sales m, recent_month r
+            WHERE m.year = r.max_year AND m.month = r.max_month
+            GROUP BY m.category, m.region, r.max_year, r.max_month
+            ORDER BY revenue DESC
+            LIMIT 2
+            """
+            sales_result = execute_query(sales_query)
+            if sales_result.get("success") and sales_result.get("data"):
+                for row in sales_result["data"]:
+                    month_names = ["", "January", "February", "March", "April", "May", "June",
+                                   "July", "August", "September", "October", "November", "December"]
+                    month_name = month_names[int(row.get('max_month', 0))] if row.get('max_month') else "Recent"
+                    year = row.get('max_year', '')
+                    insights.append({
+                        "insight_type": "opportunity",
+                        "severity": "info",
+                        "title": f"Strong Sales: {row['category']} in {row['region']}",
+                        "description": f"{row['category']} generated ${row['revenue']:,.0f} in {row['region']} ({month_name} {year})",
+                        "affected_entity": row["category"],
+                        "metric_value": row["revenue"],
+                        "recommended_action": "Consider increasing inventory for this category",
+                        "data_source": "current_sales"
+                    })
+
     # Limit and format
     insights = insights[:max_insights]
-    
+
     return json.dumps({
         "success": True,
         "row_count": len(insights),
         "data": insights,
         "narrative_summary": _format_insights_narrative(insights),
-        "source": "realtime_analysis"
+        "source": "realtime_analysis",
+        "note": "All insights generated from current data"
     }, default=str)
 
 
@@ -172,20 +158,20 @@ def _format_insights_narrative(insights: list[dict]) -> str:
 def _parse_time_period(time_period: Optional[str]) -> tuple[Optional[int], Optional[int]]:
     """
     Parse a time period string into year and month.
-    
+
     Supports formats:
     - "2024-03" or "2024-3"
     - "March 2024" or "Mar 2024"
     - "3/2024"
-    
+
     Returns:
         Tuple of (year, month) or (None, None) if not parseable
     """
     if not time_period:
         return None, None
-    
+
     time_period = time_period.strip()
-    
+
     # Try YYYY-MM format
     if "-" in time_period:
         parts = time_period.split("-")
@@ -197,7 +183,7 @@ def _parse_time_period(time_period: Optional[str]) -> tuple[Optional[int], Optio
                     return year, month
             except ValueError:
                 pass
-    
+
     # Try MM/YYYY format
     if "/" in time_period:
         parts = time_period.split("/")
@@ -209,7 +195,7 @@ def _parse_time_period(time_period: Optional[str]) -> tuple[Optional[int], Optio
                     return year, month
             except ValueError:
                 pass
-    
+
     # Try "Month YYYY" format
     month_names = {
         "january": 1, "jan": 1,
@@ -225,7 +211,7 @@ def _parse_time_period(time_period: Optional[str]) -> tuple[Optional[int], Optio
         "november": 11, "nov": 11,
         "december": 12, "dec": 12,
     }
-    
+
     words = time_period.lower().split()
     for word in words:
         if word in month_names:
@@ -238,7 +224,7 @@ def _parse_time_period(time_period: Optional[str]) -> tuple[Optional[int], Optio
                         return year, month
                 except ValueError:
                     continue
-    
+
     return None, None
 
 
@@ -250,7 +236,7 @@ def detect_anomalies_realtime(
 ) -> str:
     """
     Run real-time anomaly detection on specified metrics.
-    
+
     Compares a specific month's values against historical monthly averages
     to detect statistically significant deviations.
 
@@ -269,13 +255,13 @@ def detect_anomalies_realtime(
     # For stock_level, use inventory table (point-in-time, not monthly)
     if metric == "stock_level":
         return _detect_inventory_anomalies(catalog, entity_type, threshold_std)
-    
+
     # Parse time_period if provided
     target_year, target_month = _parse_time_period(time_period)
 
     # For revenue and units_sold, use monthly_sales with proper time comparison
     metric_column = "total_revenue" if metric == "revenue" else "total_units"
-    
+
     # Support category, region, or combined category_region
     if entity_type == "category_region":
         group_col = "category || ' in ' || region"
@@ -301,7 +287,7 @@ def detect_anomalies_realtime(
     query = f"""
     WITH monthly_data AS (
         -- Get monthly aggregates by entity
-        SELECT 
+        SELECT
             {group_col} as entity,
             year,
             month,
@@ -311,7 +297,7 @@ def detect_anomalies_realtime(
     ),
     historical_stats AS (
         -- Calculate baseline from months BEFORE the target month
-        SELECT 
+        SELECT
             entity,
             AVG(monthly_value) as mean_value,
             STDDEV(monthly_value) as std_value,
@@ -323,7 +309,7 @@ def detect_anomalies_realtime(
     ),
     target_month_data AS (
         -- Get the target month's values
-        SELECT 
+        SELECT
             entity,
             monthly_value as current_value,
             year as target_year,
@@ -331,7 +317,7 @@ def detect_anomalies_realtime(
         FROM monthly_data m
         WHERE {target_clause}
     )
-    SELECT 
+    SELECT
         t.entity,
         t.target_year,
         t.target_month,
@@ -341,7 +327,7 @@ def detect_anomalies_realtime(
         h.num_months as months_of_history,
         ROUND((t.current_value - h.mean_value) / NULLIF(h.std_value, 0), 2) as z_score,
         ROUND((t.current_value - h.mean_value) / NULLIF(h.mean_value, 0) * 100, 1) as pct_deviation,
-        CASE 
+        CASE
             WHEN (t.current_value - h.mean_value) / NULLIF(h.std_value, 0) > {threshold_std * 1.5} THEN 'critical_high'
             WHEN (t.current_value - h.mean_value) / NULLIF(h.std_value, 0) < -{threshold_std * 1.5} THEN 'critical_low'
             WHEN (t.current_value - h.mean_value) / NULLIF(h.std_value, 0) > {threshold_std} THEN 'warning_high'
@@ -367,28 +353,28 @@ def detect_anomalies_realtime(
 def _detect_inventory_anomalies(catalog: str, entity_type: str, threshold_std: float) -> str:
     """Detect anomalies in current inventory levels."""
     group_col = "category" if entity_type == "category" else "region"
-    
+
     query = f"""
     WITH entity_stats AS (
-        SELECT 
+        SELECT
             {group_col} as entity,
             SUM(quantity_on_hand) as total_stock,
             AVG(days_of_supply) as avg_dos,
             COUNT(*) as num_items,
-            SUM(CASE WHEN status = 'CRITICAL' THEN 1 ELSE 0 END) as critical_count,
-            SUM(CASE WHEN status = 'LOW' THEN 1 ELSE 0 END) as low_count
+            SUM(CASE WHEN UPPER(status) = 'CRITICAL' THEN 1 ELSE 0 END) as critical_count,
+            SUM(CASE WHEN UPPER(status) = 'LOW' THEN 1 ELSE 0 END) as low_count
         FROM {catalog}.gold.inventory_status
         GROUP BY {group_col}
     ),
     overall_stats AS (
-        SELECT 
+        SELECT
             AVG(total_stock) as mean_stock,
             STDDEV(total_stock) as std_stock,
             AVG(avg_dos) as mean_dos,
             STDDEV(avg_dos) as std_dos
         FROM entity_stats
     )
-    SELECT 
+    SELECT
         e.entity,
         e.total_stock as current_stock,
         o.mean_stock as avg_stock_across_entities,
@@ -398,7 +384,7 @@ def _detect_inventory_anomalies(catalog: str, entity_type: str, threshold_std: f
         e.low_count,
         ROUND((e.total_stock - o.mean_stock) / NULLIF(o.std_stock, 0), 2) as stock_z_score,
         ROUND((e.avg_dos - o.mean_dos) / NULLIF(o.std_dos, 0), 2) as dos_z_score,
-        CASE 
+        CASE
             WHEN e.avg_dos < 7 THEN 'critical_low'
             WHEN e.avg_dos < 14 THEN 'warning_low'
             WHEN e.avg_dos > 60 THEN 'warning_high'
@@ -409,7 +395,7 @@ def _detect_inventory_anomalies(catalog: str, entity_type: str, threshold_std: f
     ORDER BY e.avg_dos ASC
     LIMIT 10
     """
-    
+
     result = execute_query(query)
     result["metric_analyzed"] = "stock_level"
     result["entity_type"] = entity_type
@@ -424,12 +410,12 @@ def get_daily_briefing() -> str:
     Call when user starts conversation or asks for overview.
 
     Returns:
-        JSON with structured daily briefing
+        JSON with structured daily briefing based on CURRENT data
     """
     config = get_config()
     catalog = config.databricks.catalog
 
-    # Get key metrics
+    # Get key metrics (case-insensitive status matching)
     metrics_query = f"""
     SELECT 'total_revenue' as metric, SUM(total_revenue) as value
     FROM {catalog}.gold.monthly_sales
@@ -438,10 +424,10 @@ def get_daily_briefing() -> str:
     FROM {catalog}.gold.inventory_status WHERE quantity_on_hand = 0
     UNION ALL
     SELECT 'critical_stock' as metric, COUNT(*) as value
-    FROM {catalog}.gold.inventory_status WHERE status = 'CRITICAL' AND quantity_on_hand > 0
+    FROM {catalog}.gold.inventory_status WHERE UPPER(status) = 'CRITICAL' AND quantity_on_hand > 0
     UNION ALL
     SELECT 'low_stock' as metric, COUNT(*) as value
-    FROM {catalog}.gold.inventory_status WHERE status = 'LOW'
+    FROM {catalog}.gold.inventory_status WHERE UPPER(status) = 'LOW'
     """
 
     metrics_result = execute_query(metrics_query)
@@ -454,7 +440,8 @@ def get_daily_briefing() -> str:
         "narrative": _generate_briefing_narrative(
             metrics_result.get("data", []),
             insights_result.get("data", [])
-        )
+        ),
+        "data_source": "current_inventory_and_sales"
     }
     return json.dumps(briefing, default=str)
 
@@ -464,7 +451,7 @@ def _generate_briefing_narrative(metrics: list, insights: list) -> str:
     parts = ["**Daily Briefing**\n"]
 
     metrics_dict = {m.get("metric"): m.get("value", 0) for m in metrics}
-    
+
     if metrics_dict.get("stockouts", 0) > 0:
         parts.append(f"⚠️ {int(metrics_dict['stockouts'])} products currently out of stock")
     if metrics_dict.get("critical_stock", 0) > 0:
