@@ -6,7 +6,7 @@ AI-powered analytics platform for STIHL power equipment data with natural langua
 ## Tech Stack
 - Frontend: React 18, Fluent UI v9, TypeScript, Vite (src/frontend)
 - Backend: Python 3.11, FastAPI, Gunicorn/Uvicorn (src/api)
-- AI: Azure OpenAI gpt-4o-mini with function calling
+- AI: Azure OpenAI gpt-5-mini with function calling
 - Data: Databricks SQL Warehouse, Unity Catalog, Vector Search (BGE-Large)
 
 ## Architecture
