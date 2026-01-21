@@ -4,7 +4,7 @@ An AI-powered analytics platform for STIHL power equipment data, featuring natur
 
 [![Azure](https://img.shields.io/badge/Azure-Container%20Apps-0078D4?logo=microsoft-azure)](https://azure.microsoft.com)
 [![Databricks](https://img.shields.io/badge/Databricks-Unity%20Catalog-FF3621?logo=databricks)](https://databricks.com)
-[![OpenAI](https://img.shields.io/badge/Azure%20OpenAI-GPT--4o--mini-412991?logo=openai)](https://azure.microsoft.com/en-us/products/ai-services/openai-service)
+[![OpenAI](https://img.shields.io/badge/Azure%20OpenAI-GPT--5--mini-412991?logo=openai)](https://azure.microsoft.com/en-us/products/ai-services/openai-service)
 [![React](https://img.shields.io/badge/React-Fluent%20UI-61DAFB?logo=react)](https://react.dev)
 
 **🔗 Live Demo:** [ca-stihl-rnofgqn7g5tzm.happyrock-6ed25c83.westus2.azurecontainerapps.io](Available upon request)
@@ -182,7 +182,7 @@ flowchart TB
     end
 
     subgraph Azure["Azure Services"]
-        AOAI[Azure OpenAI<br/>gpt-4o-mini]
+        AOAI[Azure OpenAI<br/>gpt-5-mini]
         ACA[Container Apps]
         ACR[Container Registry]
     end
@@ -282,7 +282,7 @@ flowchart TB
 |---------|---------|
 | Azure Container Apps | Application Hosting |
 | Azure Container Registry | Image Storage |
-| Azure OpenAI | GPT-4o-mini Model |
+| Azure OpenAI | GPT-5-mini Model |
 | Databricks SQL Warehouse | Data Warehouse |
 | Databricks Vector Search | Embeddings Search |
 | Unity Catalog | Data Governance |
@@ -422,7 +422,7 @@ flowchart LR
 - Node.js 18+
 - Azure subscription
 - Databricks workspace with Unity Catalog
-- Azure OpenAI deployment (gpt-4o-mini)
+- Azure OpenAI deployment (gpt-5-mini)
 
 ### Environment Variables
 
@@ -432,7 +432,7 @@ Create a `.env` file with:
 # Azure OpenAI
 AZURE_OPENAI_ENDPOINT=https://your-endpoint.openai.azure.com/
 AZURE_OPENAI_API_KEY=your-api-key
-AZURE_OPENAI_DEPLOYMENT_GPT=gpt-4o-mini
+AZURE_OPENAI_DEPLOYMENT_GPT=gpt-5-mini
 
 # Databricks
 DATABRICKS_HOST=https://your-workspace.azuredatabricks.net
