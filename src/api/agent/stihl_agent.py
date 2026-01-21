@@ -91,9 +91,10 @@ class STIHLAnalyticsAgent:
         self.client = AzureOpenAI(
             azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
             api_key=os.environ["AZURE_OPENAI_API_KEY"],
-            api_version="2024-08-01-preview",
+            api_version=os.getenv("AZURE_OPENAI_API_VERSION", "2024-08-01-preview"),
         )
-        self.deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT_GPT", "gpt-4o-mini")
+        # Model deployment - defaults to gpt-5-mini (configurable via env var)
+        self.deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT_GPT", "gpt-5-mini")
         self.embedding_deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT_EMBEDDING", "text-embedding-ada-002")
 
         # Skill routing
