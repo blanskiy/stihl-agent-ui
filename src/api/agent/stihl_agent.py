@@ -36,8 +36,11 @@ from agent.optimizations import (
 )
 from agent.optimizations.history import HistoryConfig
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Configure logging - set to DEBUG for troubleshooting
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 # Compact system prompt (~200 tokens vs ~850)
@@ -48,6 +51,7 @@ BASE_SYSTEM_PROMPT = """You are STIHL's Analytics Agent helping analysts underst
 - Sales & inventory analysis
 - Product search and recommendations
 - Trend detection and forecasting
+- Inventory replenishment requests
 
 ## Behavior
 - For greetings → call get_daily_briefing
@@ -58,8 +62,16 @@ BASE_SYSTEM_PROMPT = """You are STIHL's Analytics Agent helping analysts underst
 - For dealers → call query_dealer_data
 - For trends → call analyze_trends
 - For forecasts → call get_sales_forecast
+- For replenishment/restock/order → IMMEDIATELY call create_shipment_request (do not ask, just do it)
 
-Lead with insights. Be specific with numbers. Recommend actions."""
+## IMPORTANT: When user asks to replenish/restock products
+Call create_shipment_request immediately for EACH product mentioned:
+- product_name: the product mentioned
+- destination: the region mentioned (or "Northeast" as default)
+- quantity: 50 (default)
+For multiple products, make multiple tool calls (one per product).
+
+Lead with insights. Be specific with numbers. Execute actions when requested."""
 
 
 class STIHLAnalyticsAgent:
@@ -148,6 +160,7 @@ class STIHLAnalyticsAgent:
             "query_inventory_data",
             "get_proactive_insights",
             "get_daily_briefing",
+            "create_shipment_request",  # Always available for replenishment
         ]
 
         if not skill_match:
@@ -263,13 +276,13 @@ class STIHLAnalyticsAgent:
 
             if self.current_skill:
                 logger.info(
-                    f"🎯 Routed to skill: {self.current_skill.skill_name} "
+                    f"Routed to skill: {self.current_skill.skill_name} "
                     f"(confidence: {self.current_skill.confidence:.2f})"
                 )
                 enhanced_prompt = self._get_enhanced_prompt(self.current_skill)
                 self._update_system_prompt(enhanced_prompt)
             else:
-                logger.info("🔄 No specific skill matched, using general agent")
+                logger.info("No specific skill matched, using general agent")
                 self._update_system_prompt(BASE_SYSTEM_PROMPT)
 
         # Optimization #1: Get filtered compact tools
@@ -285,13 +298,23 @@ class STIHLAnalyticsAgent:
         tool_call_count = 0
         final_response = None
 
+        # Determine tool_choice based on skill
+        # For replenishment skill, use "required" to ensure tools are called
+        # but don't force a specific tool - this allows multiple shipment requests
+        tool_choice = "auto"
+        if self.current_skill and self.current_skill.skill_name == "replenishment_coordinator":
+            tool_choice = "required"  # Forces tool use but allows LLM to choose which/how many
+            logger.info("Replenishment mode: tool use required")
+
         while tool_call_count < max_tool_calls:
             # Call Azure OpenAI with optimized history
+            # Only force tool_choice on first iteration
+            current_tool_choice = tool_choice if tool_call_count == 0 else "auto"
             response = self.client.chat.completions.create(
                 model=self.deployment,
                 messages=optimized_history,
                 tools=tools,
-                tool_choice="auto",
+                tool_choice=current_tool_choice,
             )
 
             response_message = response.choices[0].message
@@ -329,7 +352,6 @@ class STIHLAnalyticsAgent:
                 function_name = tool_call.function.name
                 function_args = json.loads(tool_call.function.arguments)
 
-                print(f"  🔧 Calling {function_name}({function_args})")
                 logger.debug(f"Tool call: {function_name} with args: {function_args}")
 
                 # Execute the function

@@ -21,6 +21,11 @@ from .rag_tools import (
 from .dealer_tools import query_dealer_data, DEALER_TOOL_DEFINITION
 from .forecast_tools import get_sales_forecast, FORECAST_TOOL_DEFINITION
 from .trend_tools import analyze_trends, TREND_TOOL_DEFINITION
+from .replenishment_tools import (
+    create_shipment_request,
+    get_shipment_requests,
+    REPLENISHMENT_TOOL_DEFINITIONS
+)
 
 
 # Tool definitions for Azure OpenAI function calling
@@ -196,7 +201,11 @@ TOOL_FUNCTIONS = {
     
     # SQL Tools - Trends
     "analyze_trends": analyze_trends,
-    
+
+    # SQL Tools - Replenishment
+    "create_shipment_request": create_shipment_request,
+    "get_shipment_requests": get_shipment_requests,
+
     # RAG Tools
     **RAG_TOOL_FUNCTIONS
 }
@@ -209,6 +218,7 @@ TOOL_DEFINITIONS = (
     [DEALER_TOOL_DEFINITION] +
     [FORECAST_TOOL_DEFINITION] +
     [TREND_TOOL_DEFINITION] +
+    REPLENISHMENT_TOOL_DEFINITIONS +
     RAG_TOOL_DEFINITIONS
 )
 
@@ -216,7 +226,7 @@ __all__ = [
     # Registry
     "TOOL_FUNCTIONS",
     "TOOL_DEFINITIONS",
-    
+
     # SQL Tools
     "query_sales_data",
     "query_inventory_data",
@@ -226,7 +236,11 @@ __all__ = [
     "query_dealer_data",
     "get_sales_forecast",
     "analyze_trends",
-    
+
+    # Replenishment Tools
+    "create_shipment_request",
+    "get_shipment_requests",
+
     # RAG Tools
     "search_products",
     "compare_products",

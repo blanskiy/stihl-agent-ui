@@ -36,8 +36,8 @@ class InventorySkill(BaseSkill):
             r"warehouse",
             r"distribution.center",
             
-            # Alert patterns
-            r"(restock|reorder|replenish)",
+            # Alert patterns (note: replenish is handled by ReplenishmentSkill)
+            r"\breorder\b",
             r"(critical|low|normal).*(status|level)",
         ]
 

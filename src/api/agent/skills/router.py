@@ -19,6 +19,7 @@ from .insights_skill import InsightsSkill
 from .dealer_skill import DealerSkill
 from .forecast_skill import ForecastSkill
 from .trend_skill import TrendSkill
+from .replenishment_skill import ReplenishmentSkill
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +53,7 @@ class SkillRouter:
         self.register(DealerSkill())
         self.register(ForecastSkill())
         self.register(TrendSkill())
+        self.register(ReplenishmentSkill())
 
     def register(self, skill: BaseSkill):
         """
@@ -112,6 +114,7 @@ class SkillRouter:
             match = skill.matches(query)
             if match:
                 matches.append(match)
+                print(f"  📋 Matched: {skill.name} (confidence: {match.confidence:.2f}, priority: {skill.priority})")
                 logger.debug(f"Query matched {skill.name} with confidence {match.confidence}")
 
         if not matches:

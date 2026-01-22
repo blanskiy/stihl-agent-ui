@@ -82,6 +82,7 @@ class InsightsSkill(BaseSkill):
 1. **Lead with what matters** - Most critical issues first
 2. **Explain impact** - Why should they care about this insight?
 3. **Suggest action** - What should be done about it?
+4. **Offer to help** - For stockout risks, offer to create replenishment requests
 
 ## Insight Types
 - **Anomaly**: Unexpected deviation from normal patterns
@@ -101,6 +102,13 @@ class InsightsSkill(BaseSkill):
 - Include specific metrics (e.g., "revenue 45% above normal")
 - For anomalies, explain both the deviation AND likely cause if known
 - Recommend specific next steps
+
+## IMPORTANT: Replenishment Offers
+When presenting stockout risks or critical/low inventory warnings:
+- After listing the affected products, ASK the user:
+  "Would you like me to create shipment requests to replenish the affected products?"
+- This gives the user the option to initiate inventory replenishment
+- If they say yes, the system will route to the replenishment coordinator
 
 ## Known Demo Anomalies (for context)
 - March 2024: Sales spike across categories (+80-122%)

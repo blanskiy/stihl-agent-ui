@@ -53,6 +53,19 @@ class DatabricksClient:
                 cursor: Cursor = conn.cursor()
                 cursor.execute(query, params)
 
+                # Check if this is a SELECT query (has result set)
+                # INSERT/UPDATE/DELETE don't return description
+                if cursor.description is None:
+                    # Non-SELECT query (INSERT, UPDATE, DELETE)
+                    return {
+                        "success": True,
+                        "row_count": cursor.rowcount if cursor.rowcount >= 0 else 0,
+                        "has_more": False,
+                        "columns": [],
+                        "data": [],
+                        "message": "Query executed successfully"
+                    }
+
                 columns = [desc[0] for desc in cursor.description]
                 rows = cursor.fetchmany(max_rows)
                 data = [dict(zip(columns, row)) for row in rows]

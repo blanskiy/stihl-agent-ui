@@ -202,6 +202,42 @@ TREND_TOOL_COMPACT = {
     }
 }
 
+# Compact Replenishment Tool Definitions
+REPLENISHMENT_TOOLS_COMPACT = [
+    {
+        "type": "function",
+        "function": {
+            "name": "create_shipment_request",
+            "description": "IMMEDIATELY create shipment request when user asks to replenish/restock/order. Call directly without asking.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "product_name": {"type": "string"},
+                    "destination": {"type": "string"},
+                    "quantity": {"type": "integer"},
+                    "product_id": {"type": "integer"}
+                },
+                "required": ["product_name", "destination", "quantity"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_shipment_requests",
+            "description": "Query existing shipment requests",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "status": {"type": "string", "enum": ["PENDING", "APPROVED", "SHIPPED", "COMPLETED"]},
+                    "destination": {"type": "string"},
+                    "limit": {"type": "integer", "default": 10}
+                }
+            }
+        }
+    }
+]
+
 
 # Mapping from tool names to compact definitions
 COMPACT_TOOL_MAP = {
@@ -216,6 +252,8 @@ COMPACT_TOOL_MAP = {
     "query_dealer_data": DEALER_TOOL_COMPACT,
     "get_sales_forecast": FORECAST_TOOL_COMPACT,
     "analyze_trends": TREND_TOOL_COMPACT,
+    "create_shipment_request": REPLENISHMENT_TOOLS_COMPACT[0],
+    "get_shipment_requests": REPLENISHMENT_TOOLS_COMPACT[1],
 }
 
 # All compact definitions combined
@@ -227,6 +265,7 @@ TOOL_DEFINITIONS_COMPACT = [
     DEALER_TOOL_COMPACT,
     FORECAST_TOOL_COMPACT,
     TREND_TOOL_COMPACT,
+    *REPLENISHMENT_TOOLS_COMPACT,
 ]
 
 

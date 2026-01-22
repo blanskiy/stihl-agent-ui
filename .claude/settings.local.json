@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd replenishment sub-agent for inventory shipment requests\n\n- Add ReplenishmentSkill with triggers for replenish/restock/order keywords\n- Add create_shipment_request and get_shipment_requests tools\n- Support single and multiple product replenishment in one request\n- Handle string product_id format \\(e.g., ''FS-111''\\) from inventory_status\n- Add INSERT/UPDATE/DELETE handling to databricks_client\n- Update insights_skill to offer replenishment for low stock warnings\n- Register replenishment tools in tool registry and compact definitions\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+    ]
+  }
+}

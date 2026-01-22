@@ -154,11 +154,6 @@ async def chat(request: Request):
     async def generate_response() -> AsyncGenerator[str, None]:
         """Generate SSE events for the response."""
         try:
-            # Log routing info
-            if agent.use_skill_routing:
-                routing = agent.get_routing_explanation(user_message)
-                logger.info(f"Routing: {routing}")
-            
             # Get response from agent
             response = agent.chat(user_message)
             
